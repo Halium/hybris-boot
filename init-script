@@ -30,30 +30,30 @@ DATA_PARTITION=%DATA_PART%
 DEFAULT_OS=%DEFAULT_OS%
 
 set_welcome_msg(){
-cat <<EOF > /etc/issue.net
+    cat <<EOF > /etc/issue.net
 Welcome to the Mer/SailfishOS Boat loader debug init system.
 
 Log so far is in /init.log
 
 To make post-switch_root halt before starting systemd, perform:
 EOF
-if [ "$DONE_SWITCH" = "no" ]; then
-cat <<EOF >> /etc/issue.net
+    if [ "$DONE_SWITCH" = "no" ]; then
+        cat <<EOF >> /etc/issue.net
   touch /target/init_enter_debug2
 EOF
-else
-cat <<EOF >> /etc/issue.net
+    else
+        cat <<EOF >> /etc/issue.net
   touch /init_enter_debug2
 EOF
-fi
-cat <<EOF >> /etc/issue.net
+    fi
+        cat <<EOF >> /etc/issue.net
 (When run post-switch_root, telnet is on port 2323, not 23)
 
 EOF
 
-HALT_BOOT="${1:-y}"
-if [ "$HALT_BOOT" = "y" ]; then
-cat <<EOF >> /etc/issue.net
+    HALT_BOOT="${1:-y}"
+    if [ "$HALT_BOOT" = "y" ]; then
+        cat <<EOF >> /etc/issue.net
 You may inject commands into init shell process (PID 1):
 
 To see output of commands as they're injected:
@@ -68,10 +68,10 @@ To allow init to continue:
   echo "continue" >/init-ctl/stdin
 
 EOF
-fi
+    fi
 
-if [ "$DONE_SWITCH" = "no" ]; then
-    cat <<EOF >> /etc/issue.net
+    if [ "$DONE_SWITCH" = "no" ]; then
+        cat <<EOF >> /etc/issue.net
 In order to work safely with the device's mmc you should
   echo "umount_stowaways" >/init-ctl/stdin
 
@@ -80,7 +80,7 @@ Then you can mount and modify exported mass storage on host. When done
 
 
 EOF
-fi
+    fi
 }
 
 export PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
@@ -100,9 +100,9 @@ fi
 
 # Get options from kernel command line
 get_opt() {
-  for param in $(cat /proc/cmdline); do
-    echo "$param" | grep "^$1=*" | cut -d'=' -f2
-  done
+    for param in $(cat /proc/cmdline); do
+        echo "$param" | grep "^$1=*" | cut -d'=' -f2
+    done
 }
 
 # Minimal mounts for initrd or pre-init debug session
@@ -131,7 +131,7 @@ do_hotplug_scan()
 
 bootsplash() {
     if [ x$BOOTLOGO = x1 ]; then
-	zcat /bootsplash.gz > /dev/fb0
+        zcat /bootsplash.gz > /dev/fb0
     fi
 }
 
@@ -141,14 +141,14 @@ mount_stowaways() {
     if [ ! -z $DATA_PARTITION ]; then
         data_subdir="$(get_opt data_subdir)"
 
-	mkdir /data
-	mkdir /target
+        mkdir /data
+        mkdir /target
 
-	mount $DATA_PARTITION /data
-	mount /data/rootfs.img /target
+        mount $DATA_PARTITION /data
+        mount /data/rootfs.img /target
 
-	mkdir -p /target/data # in new fs
-	mount --bind /data/${data_subdir} /target/data
+        mkdir -p /target/data # in new fs
+        mount --bind /data/${data_subdir} /target/data
     else
         echo "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
     fi
@@ -157,15 +157,15 @@ mount_stowaways() {
 
 umount_stowaways() {
     if [ ! -z $DATA_PARTITION ]; then
-	umount /target/data
-	umount /target
-	umount /data
+        umount /target/data
+        umount /target
+        umount /data
     fi
 }
 
 # Sugar for accessing usb config
 write() {
-  echo -n "$2" > "$1"
+    echo -n "$2" > "$1"
 }
 
 inject_loop() {
@@ -179,7 +179,7 @@ inject_loop() {
     echo "########################## Beginning inject loop"
     while : ; do
         while read IN; do
-	    if [ "$IN" = "continue" ]; then break 2;fi
+            if [ "$IN" = "continue" ]; then break 2;fi
             $IN
         done <$INJ_STDIN
     done
@@ -202,6 +202,7 @@ usb_setup() {
       write $ANDROID_USB/functions     $USB_FUNCTIONS
       write $ANDROID_USB/enable        1
 }
+
 # This lets us communicate errors to host (if it needs disable/enable then that's a problem)
 usb_info() {
     # make sure USB is settled
@@ -226,10 +227,10 @@ run_debug_session() {
 
     # Unable to set up USB interface? Reboot.
     if [ x$USB_IFACE = xnotfound ]; then
-	    usb_info "Mer Debug: ERROR: could not setup USB as usb0 or rndis0"
-	    dmesg
-	    sleep 60 # plenty long enough to check usb on host
-	    reboot -f
+        usb_info "Mer Debug: ERROR: could not setup USB as usb0 or rndis0"
+        dmesg
+        sleep 60 # plenty long enough to check usb on host
+        reboot -f
     fi
 
     # Create /etc/udhcpd.conf file.
@@ -247,15 +248,15 @@ run_debug_session() {
     set_welcome_msg $HALT_BOOT
 
     if [ -z $DISABLE_TELNET ]; then
-    # Non-blocking telnetd
-    echo "########################## starting telnetd"
-    # We run telnetd on different ports pre/post-switch_root This
-    # avoids problems with an unterminated pre-switch_root telnetd
-    # hogging the port
-    $EXPLICIT_BUSYBOX telnetd -b ${LOCAL_IP}:${TELNET_DEBUG_PORT} -l /bin/sh
+        # Non-blocking telnetd
+        echo "########################## starting telnetd"
+        # We run telnetd on different ports pre/post-switch_root This
+        # avoids problems with an unterminated pre-switch_root telnetd
+        # hogging the port
+        $EXPLICIT_BUSYBOX telnetd -b ${LOCAL_IP}:${TELNET_DEBUG_PORT} -l /bin/sh
 
-    # For some reason this does not work in rootfs
-    usb_info "Mer Debug telnet on port $TELNET_DEBUG_PORT on $USB_IFACE $LOCAL_IP - also running udhcpd"
+        # For some reason this does not work in rootfs
+        usb_info "Mer Debug telnet on port $TELNET_DEBUG_PORT on $USB_IFACE $LOCAL_IP - also running udhcpd"
     fi
 
     if [ "$HALT_BOOT" = "y" ]; then
@@ -275,16 +276,16 @@ run_debug_session() {
 check_kernel_config() {
     echo "Checking kernel config"
     if [ ! -e /proc/config.gz ]; then
-	echo "No /proc/config.gz. Enable CONFIG_IKCONFIG and CONFIG_IKCONFIG_PROC" >> /diagnosis.log
+        echo "No /proc/config.gz. Enable CONFIG_IKCONFIG and CONFIG_IKCONFIG_PROC" >> /diagnosis.log
     else
-	# Must be =y
-	for x in CONFIG_CGROUPS CONFIG_AUTOFS4_FS CONFIG_DEVTMPFS_MOUNT CONFIG_DEVTMPFS CONFIG_UNIX CONFIG_INOTIFY_USER CONFIG_SYSVIPC CONFIG_NET CONFIG_PROC_FS CONFIG_SIGNALFD CONFIG_SYSFS CONFIG_TMPFS_POSIX_ACL CONFIG_VT; do
-		zcat /proc/config.gz | grep -E "^$x=y\$" || echo "$x=y not found in /proc/config.gz" >> /diagnosis.log
- 	done
-	# Must not be =y
-	for x in CONFIG_ANDROID_LOW_MEMORY_KILLER CONFIG_DUMMY CONFIG_SYSFS_DEPRECATED; do
-		zcat /proc/config.gz | grep -E "^$x=y\$" && echo "$x=y found in /proc/config.gz, must be disabled" >> /diagnosis.log
-	done
+        # Must be =y
+        for x in CONFIG_CGROUPS CONFIG_AUTOFS4_FS CONFIG_DEVTMPFS_MOUNT CONFIG_DEVTMPFS CONFIG_UNIX CONFIG_INOTIFY_USER CONFIG_SYSVIPC CONFIG_NET CONFIG_PROC_FS CONFIG_SIGNALFD CONFIG_SYSFS CONFIG_TMPFS_POSIX_ACL CONFIG_VT; do
+            zcat /proc/config.gz | grep -E "^$x=y\$" || echo "$x=y not found in /proc/config.gz" >> /diagnosis.log
+        done
+        # Must not be =y
+        for x in CONFIG_ANDROID_LOW_MEMORY_KILLER CONFIG_DUMMY CONFIG_SYSFS_DEPRECATED; do
+            zcat /proc/config.gz | grep -E "^$x=y\$" && echo "$x=y found in /proc/config.gz, must be disabled" >> /diagnosis.log
+        done
     fi
 }
 
@@ -320,21 +321,21 @@ if [ "$DONE_SWITCH" = "no" ]; then
     [ -f /target/init_disable_telnet ] && DISABLE_TELNET="y"
 
     if ! [ "$DBG_REASON" = "" ] ; then
-	# During debug we export mmc too (some variations in location here)
-	lun=/sys/class/android_usb/f_mass_storage/lun/file
-	if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
-	lun=/sys/class/android_usb/f_mass_storage/lun0/file
-	if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
-	USB_FUNCTIONS=rndis,mass_storage
+        # During debug we export mmc too (some variations in location here)
+        lun=/sys/class/android_usb/f_mass_storage/lun/file
+        if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
+        lun=/sys/class/android_usb/f_mass_storage/lun0/file
+        if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
+        USB_FUNCTIONS=rndis,mass_storage
 
-	run_debug_session "$DBG_REASON" "y"
+        run_debug_session "$DBG_REASON" "y"
 
-	# Tidy up before we switch_root (rootfs init-debug leaves these running during bootup)
-	killall telnetd
-	killall udhcpd
+        # Tidy up before we switch_root (rootfs init-debug leaves these running during bootup)
+        killall telnetd
+        killall udhcpd
 
-	USB_FUNCTIONS=rndis
-	usb_setup "Mer Debug: done debug, disabling storage"
+        USB_FUNCTIONS=rndis
+        usb_setup "Mer Debug: done debug, disabling storage"
     fi
 
     # Disable mdev hotplug now - let udev handle it in main boot
