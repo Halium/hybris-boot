@@ -1,7 +1,12 @@
 #!/bin/sh
 # Fix up mount points device node names.
-# This is broken pending systemd > 191-2 so hack the generated unit files :(
-# See: https://bugzilla.redhat.com/show_bug.cgi?id=859297
+#
+# /data needs to be mounted in initrd, but there is no udev that early,
+# which means there is no /dev/block/platform/*/by-name/* (or bootdevice).
+# This file is a map from the "by-name" path to /dev/mmcblkMpN.
+# It also serves dhd to convert fstab and *.rc mount entries to systemd units,
+# because at that boot stage there is still no udev "by-name" paths, even when
+# systemd starts to execut the "*.mount" units.
 
 DEVICE=$1
 shift
@@ -9,6 +14,63 @@ shift
 echo "Fixing mount-points for device $DEVICE"
 
 case "$DEVICE" in
+     "suzu")
+         sed -i \
+             -e 's block/bootdevice/by-name/DDR mmcblk0p16 ' \
+             -e 's block/bootdevice/by-name/FOTAKernel mmcblk0p42 ' \
+             -e 's block/bootdevice/by-name/LTALabel mmcblk0p2 ' \
+             -e 's block/bootdevice/by-name/Qnovo mmcblk0p46 ' \
+             -e 's block/bootdevice/by-name/TA mmcblk0p1 ' \
+             -e 's block/bootdevice/by-name/aboot mmcblk0p20 ' \
+             -e 's block/bootdevice/by-name/abootbak mmcblk0p21 ' \
+             -e 's block/bootdevice/by-name/apdp mmcblk0p37 ' \
+             -e 's block/bootdevice/by-name/apps_log mmcblk0p44 ' \
+             -e 's block/bootdevice/by-name/boot mmcblk0p22 ' \
+             -e 's block/bootdevice/by-name/cache mmcblk0p24 ' \
+             -e 's block/bootdevice/by-name/cmnlib mmcblk0p33 ' \
+             -e 's block/bootdevice/by-name/cmnlibbak mmcblk0p35 ' \
+             -e 's block/bootdevice/by-name/config mmcblk0p27 ' \
+             -e 's block/bootdevice/by-name/devcfg mmcblk0p31 ' \
+             -e 's block/bootdevice/by-name/devinfo mmcblk0p23 ' \
+             -e 's block/bootdevice/by-name/diag mmcblk0p45 ' \
+             -e 's block/bootdevice/by-name/dpo mmcblk0p39 ' \
+             -e 's block/bootdevice/by-name/dsp mmcblk0p13 ' \
+             -e 's block/bootdevice/by-name/fsg mmcblk0p17 ' \
+             -e 's block/bootdevice/by-name/hyp mmcblk0p11 ' \
+             -e 's block/bootdevice/by-name/hypbak mmcblk0p12 ' \
+             -e 's block/bootdevice/by-name/keymaster mmcblk0p34 ' \
+             -e 's block/bootdevice/by-name/keymasterbak mmcblk0p36 ' \
+             -e 's block/bootdevice/by-name/keystore mmcblk0p26 ' \
+             -e 's block/bootdevice/by-name/limits mmcblk0p29 ' \
+             -e 's block/bootdevice/by-name/mcfg mmcblk0p32 ' \
+             -e 's block/bootdevice/by-name/modem mmcblk0p3 ' \
+             -e 's block/bootdevice/by-name/modemst1 mmcblk0p14 ' \
+             -e 's block/bootdevice/by-name/modemst2 mmcblk0p15 ' \
+             -e 's block/bootdevice/by-name/mota mmcblk0p30 ' \
+             -e 's block/bootdevice/by-name/msadp mmcblk0p38 ' \
+             -e 's block/bootdevice/by-name/oem mmcblk0p28 ' \
+             -e 's block/bootdevice/by-name/persist mmcblk0p25 ' \
+             -e 's block/bootdevice/by-name/rdimage mmcblk0p43 ' \
+             -e 's block/bootdevice/by-name/rpm mmcblk0p7 ' \
+             -e 's block/bootdevice/by-name/rpmbak mmcblk0p8 ' \
+             -e 's block/bootdevice/by-name/s1sbl mmcblk0p40 ' \
+             -e 's block/bootdevice/by-name/s1sblbak mmcblk0p41 ' \
+             -e 's block/bootdevice/by-name/sbl1 mmcblk0p5 ' \
+             -e 's block/bootdevice/by-name/sbl1bak mmcblk0p6 ' \
+             -e 's block/bootdevice/by-name/sec mmcblk0p18 ' \
+             -e 's block/bootdevice/by-name/splash mmcblk0p19 ' \
+             -e 's block/bootdevice/by-name/ssd mmcblk0p4 ' \
+             -e 's block/bootdevice/by-name/system mmcblk0p52 ' \
+             -e 's block/bootdevice/by-name/tz mmcblk0p9 ' \
+             -e 's block/bootdevice/by-name/tzbak mmcblk0p10 ' \
+             -e 's block/bootdevice/by-name/tzs1attest mmcblk0p47 ' \
+             -e 's block/bootdevice/by-name/tzs1attestbak mmcblk0p48 ' \
+             -e 's block/bootdevice/by-name/tzs1sbl mmcblk0p49 ' \
+             -e 's block/bootdevice/by-name/tzs1sblbak mmcblk0p50 ' \
+             -e 's block/bootdevice/by-name/userdata mmcblk0p51 ' \
+            "$@"
+        ;;
+
     "moto_msm8960_jbbl")
        sed -i \
             -e 's block/platform/msm_sdcc.1/by-name/aboot mmcblk0p5 ' \
@@ -146,50 +208,10 @@ case "$DEVICE" in
 
     "bullhead")
         sed -i \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/DDR mmcblk0p28 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/aboot mmcblk0p8 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/abootbak mmcblk0p14 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/apdp mmcblk0p17 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/boot mmcblk0p37 ' \
             -e 's block/platform/soc.0/f9824900.sdhci/by-name/cache mmcblk0p40 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/cmnlib mmcblk0p33 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/cmnlibak mmcblk0p35 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/config mmcblk0p16 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/devinfo mmcblk0p43 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/dpo mmcblk0p19 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/fsc mmcblk0p20 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/fsg mmcblk0p27 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/grow mmcblk0p46 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/hyp mmcblk0p6 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/hypbak mmcblk0p12 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/imgdata mmcblk0p29 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/keymaster mmcblk0p32 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/keymasterbak mmcblk0p34 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/keystore mmcblk0p44 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/laf mmcblk0p31 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/limits mmcblk0p15 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/metadata mmcblk0p30 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/misc mmcblk0p23 ' \
             -e 's block/platform/soc.0/f9824900.sdhci/by-name/modem mmcblk0p1 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/modemst1 mmcblk0p25 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/modemst2 mmcblk0p26 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/msadp mmcblk0p18 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/oem mmcblk0p36 ' \
             -e 's block/platform/soc.0/f9824900.sdhci/by-name/persist mmcblk0p24 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/persistent mmcblk0p42 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/pmic mmcblk0p2 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/pmicbak mmcblk0p10 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/recovery mmcblk0p38 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/rpm mmcblk0p7 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/rpmbak mmcblk0p13 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/sbl1 mmcblk0p3 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/sbl1bak mmcblk0p9 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/sdi mmcblk0p5 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/sec mmcblk0p22 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/ssd mmcblk0p21 ' \
             -e 's block/platform/soc.0/f9824900.sdhci/by-name/system mmcblk0p41 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/tz mmcblk0p4 ' \
-            -e 's block/platform/soc.0/f9824900.sdhci/by-name/tzbak mmcblk0p11 ' \
             -e 's block/platform/soc.0/f9824900.sdhci/by-name/userdata mmcblk0p45 ' \
             -e 's block/platform/soc.0/f9824900.sdhci/by-name/vendor mmcblk0p39 ' \
             "$@"
@@ -763,88 +785,34 @@ case "$DEVICE" in
 
     "pme")
         sed -i \
-             -e 's block/platform/soc/7464900.sdhci/by-name/aboot mmcblk0p10 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/absolute mmcblk0p66 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/adsp mmcblk0p31 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/apdp mmcblk0p18 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/apppreload mmcblk0p64 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/board_info mmcblk0p1 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/boot mmcblk0p59 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/cache mmcblk0p61 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/carrier mmcblk0p53 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/cdt mmcblk0p23 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/cmnlib32 mmcblk0p16 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/cmnlib64 mmcblk0p17 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/cota mmcblk0p65 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/ddr mmcblk0p22 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/devcfg mmcblk0p14 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/devinfo mmcblk0p13 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/devlog mmcblk0p42 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/dip mmcblk0p35 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/dpo mmcblk0p20 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/dsp mmcblk0p57 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/extra mmcblk0p44 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/fataldevlog mmcblk0p41 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/fp mmcblk0p32 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/frp mmcblk0p50 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/fsc mmcblk0p45 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/fsg mmcblk0p29 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/hosd mmcblk0p11 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/hyp mmcblk0p9 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/keymaster mmcblk0p55 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/keystore mmcblk0p54 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/lksecapp mmcblk0p15 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/local mmcblk0p43 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/mdtp mmcblk0p34 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/mfg mmcblk0p2 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/misc mmcblk0p38 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/modemst1 mmcblk0p39 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/modemst2 mmcblk0p40 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/mota mmcblk0p56 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/msadp mmcblk0p19 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/persist mmcblk0p48 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/pg1fs mmcblk0p3 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/pg2fs mmcblk0p4 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/pmic mmcblk0p8 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/radio mmcblk0p30 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/ramdump mmcblk0p51 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/recovery mmcblk0p60 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/reserve1 mmcblk0p37 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/reserve2 mmcblk0p58 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/rfg_0 mmcblk0p24 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/rfg_1 mmcblk0p25 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/rfg_2 mmcblk0p26 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/rfg_3 mmcblk0p27 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/rfg_4 mmcblk0p28 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/rfg_8 mmcblk0p46 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/rpm mmcblk0p7 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/sec mmcblk0p49 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/skylink mmcblk0p52 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/slpi mmcblk0p33 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/sp1 mmcblk0p21 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/ssd mmcblk0p47 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/system mmcblk0p62 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/tool_diag mmcblk0p12 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/tz mmcblk0p6 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/userdata mmcblk0p63 ' \
              -e 's block/platform/soc/7464900.sdhci/by-name/venus mmcblk0p36 ' \
-             -e 's block/platform/soc/7464900.sdhci/by-name/xbl mmcblk0p5 ' \
             "$@"
         ;;
-	"Z00L"|"Z00LD")
+	
+  "Z00L"|"Z00LD")
         sed -i \           
-	    -e 's block/bootdevice/by-name/asdf mmcblk0p33 ' \	    
-	    -e 's block/bootdevice/by-name/boot mmcblk0p37 ' \
-	    -e 's block/bootdevice/by-name/cache mmcblk0p44 ' \
-	    -e 's block/bootdevice/by-name/factory mmcblk0p20 ' \
-	    -e 's block/bootdevice/by-name/misc mmcblk0p30 ' \
-	    -e 's block/bootdevice/by-name/modem mmcblk0p41 ' \
-	    -e 's block/bootdevice/by-name/persist mmcblk0p39 ' \
-	    -e 's block/bootdevice/by-name/recovery mmcblk0p38 ' \
-	    -e 's block/bootdevice/by-name/system mmcblk0p45 ' \
-	    -e 's block/bootdevice/by-name/userdata mmcblk0p46 ' \
+	           -e 's block/bootdevice/by-name/asdf mmcblk0p33 ' \	    
+	           -e 's block/bootdevice/by-name/boot mmcblk0p37 ' \
+	           -e 's block/bootdevice/by-name/cache mmcblk0p44 ' \
+	           -e 's block/bootdevice/by-name/factory mmcblk0p20 ' \
+	           -e 's block/bootdevice/by-name/misc mmcblk0p30 ' \
+	           -e 's block/bootdevice/by-name/modem mmcblk0p41 ' \
+	           -e 's block/bootdevice/by-name/persist mmcblk0p39 ' \
+	           -e 's block/bootdevice/by-name/recovery mmcblk0p38 ' \
+	           -e 's block/bootdevice/by-name/system mmcblk0p45 ' \
+	           -e 's block/bootdevice/by-name/userdata mmcblk0p46 ' \
             "$@"
-	;;
+	      ;;
+    
     "oneplus3")
         sed -i \
             -e 's block/bootdevice/by-name/boot sde18 ' \
@@ -863,10 +831,13 @@ case "$DEVICE" in
         ;;
     "oneplus2")
         sed -i \
-            -e 's block/bootdevice/by-name/boot mmcblk0p7 ' \
-            -e 's block/bootdevice/by-name/userdata mmcblk0p28 ' \
-            -e 's block/bootdevice/by-name/system mmcblk0p27 ' \
-            -e 's block/bootdevice/by-name/cache mmcblk0p15 ' \
+            -e 's block/bootdevice/by-name/boot mmcblk0p35 ' \
+            -e 's block/bootdevice/by-name/system mmcblk0p42 ' \
+            -e 's block/bootdevice/by-name/userdata mmcblk0p43 ' \
+            -e 's block/bootdevice/by-name/cache mmcblk0p41 ' \
+            -e 's block/bootdevice/by-name/persist mmcblk0p37 ' \
+            -e 's block/bootdevice/by-name/modem mmcblk0p1 ' \
+            -e 's block/bootdevice/by-name/bluetooth mmcblk0p2 ' \
             "$@"
         ;;
     "shamu")
@@ -894,14 +865,50 @@ case "$DEVICE" in
             -e 's block/mmcblk0p3 mmcblk0p3 ' \
             "$@"
         ;;
+
+    "addison")
+        sed -i \
+            -e 's block/bootdevice/by-name/boot mmcblk0p37 ' \
+            -e 's block/bootdevice/by-name/cache mmcblk0p52 ' \
+            -e 's block/bootdevice/by-name/dsp mmcblk0p22 ' \
+            -e 's block/bootdevice/by-name/fsg mmcblk0p29 ' \
+            -e 's block/bootdevice/by-name/modem mmcblk0p19 ' \
+            -e 's block/bootdevice/by-name/persist mmcblk0p30 ' \
+            -e 's block/bootdevice/by-name/recovery mmcblk0p38 ' \
+            -e 's block/bootdevice/by-name/system mmcblk0p53 ' \
+            -e 's block/bootdevice/by-name/userdata mmcblk0p54 ' \
+            "$@"
+        ;;
+
+    "mido")
+        sed -i \
+            -e 's block/bootdevice/by-name/boot mmcblk0p21 ' \
+            -e 's block/bootdevice/by-name/cache mmcblk0p25 ' \
+            -e 's block/bootdevice/by-name/config mmcblk0p29 ' \
+            -e 's block/bootdevice/by-name/dsp mmcblk0p12 ' \
+            -e 's block/bootdevice/by-name/fsc mmcblk0p2 ' \
+            -e 's block/bootdevice/by-name/misc mmcblk0p27 ' \
+            -e 's block/bootdevice/by-name/modem mmcblk0p1 ' \
+            -e 's block/bootdevice/by-name/modemst1 mmcblk0p13 ' \
+            -e 's block/bootdevice/by-name/modemst2 mmcblk0p14 ' \
+            -e 's block/bootdevice/by-name/persist mmcblk0p26 ' \
+            -e 's block/bootdevice/by-name/recovery mmcblk0p22 ' \
+            -e 's block/bootdevice/by-name/rpm mmcblk0p6 ' \
+            -e 's block/bootdevice/by-name/sbl1 mmcblk0p4 ' \
+            -e 's block/bootdevice/by-name/splash mmcblk0p18 ' \
+            -e 's block/bootdevice/by-name/ssd mmcblk0p3 ' \
+            -e 's block/bootdevice/by-name/system mmcblk0p24 ' \
+            -e 's block/bootdevice/by-name/userdata mmcblk0p49 ' \
+            -e 's block/bootdevice/by-name/oem mmcblk0p30 ' \
+            "$@"
+        ;;
     *)
 	cat <<EOF
 
 ****************************************************************
 ****************************************************************
 ERROR: $DEVICE does not have mountpoint fixup data - see
-       SailfishOS HADK for details on how to fix this
-       Check: device/$VENDOR/$DEVICE/recovery.fstab
+       Sailfish OS HADK for details on how to fix this.
 ****************************************************************
 ****************************************************************
 
