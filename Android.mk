@@ -52,13 +52,14 @@ ifeq "$(HYBRIS_FSTABS)" ""
 TARGET_VENDOR := "$(shell echo $(PRODUCT_MANUFACTURER) | tr '[:upper:]' '[:lower:]')"
 HYBRIS_FSTABS := $(shell find device/$(TARGET_VENDOR) -name *fstab* | grep -v goldfish)
 endif
-# Some devices devices have the short vendor name in PRODUCT_BRAND so try to
+# Some devices have the short vendor name in PRODUCT_BRAND so try to
 # search from device/PRODUCT_BRAND if fstab files are still not found.
 ifeq "$(HYBRIS_FSTABS)" ""
 TARGET_VENDOR := "$(shell echo $(PRODUCT_BRAND) | tr '[:upper:]' '[:lower:]')"
 HYBRIS_FSTABS := $(shell find device/$(TARGET_VENDOR) -name *fstab* | grep -v goldfish)
 endif
-
+# Other path for Xiaomi devices
+HYBRIS_FSTABS := $(shell find device/*/* -name *fstab* | grep -v goldfish)
 # Get the unique /dev field(s) from the line(s) containing the fs mount point
 # Note the perl one-liner uses double-$ as per Makefile syntax
 HYBRIS_BOOT_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /boot $(HYBRIS_FSTABS) | sort -u)
