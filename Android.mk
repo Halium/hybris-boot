@@ -59,6 +59,7 @@ TARGET_VENDOR := "$(shell echo $(PRODUCT_BRAND) | tr '[:upper:]' '[:lower:]')"
 HYBRIS_FSTABS := $(shell find device/$(TARGET_VENDOR) -name *fstab* | grep -v goldfish)
 endif
 # Other path for Xiaomi devices
+ifeq "$(HYBRIS_FSTABS)" ""
 HYBRIS_FSTABS := $(shell find device/*/* -name *fstab* | grep -v goldfish)
 # Get the unique /dev field(s) from the line(s) containing the fs mount point
 # Note the perl one-liner uses double-$ as per Makefile syntax
