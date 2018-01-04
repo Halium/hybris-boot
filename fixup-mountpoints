@@ -257,7 +257,7 @@ case "$DEVICE" in
             "$@"
         ;;
 
-    "i9305" | "encore" | "n7000" | "n7100" | "i9300" | "anzu" | \
+    "encore" | "n7000" | "n7100" | "anzu" | \
     "coconut" | "haida" | "hallon" | "iyokan" | "mango" | "phoenix" | \
     "satsuma" | "smultron" | "urushi" | "zeus" | "jenad")
     # Untested for other revisions of Samsung GT-S6500:
@@ -984,6 +984,26 @@ case "$DEVICE" in
             -e 's block/bootdevice/by-name/boot mmcblk0p31 ' \
             -e 's block/bootdevice/by-name/recovery mmcblk0p32 ' \
             -e 's block/bootdevice/by-name/misc mmcblk0p9 ' \
+            "$@"
+        ;;
+    "i9300")
+        sed -i \
+            -e 's block/platform/dw_mmc/by-name/USERDATA mmcblk0p16 ' \
+            -e 's block/platform/dw_mmc/by-name/SYSTEM mmcblk0p13 ' \
+            -e 's block/platform/dw_mmc/by-name/CACHE mmcblk0p12 ' \
+            -e 's block/platform/dw_mmc/by-name/BOOT mmcblk0p08 ' \
+            -e 's block/platform/dw_mmc/by-name/RECOVERY mmcblk0p09 ' \
+            -e 's block/platform/dw_mmc/by-name/RADIO mmcblk0p10 ' \
+            "$@"
+        ;;
+    "i9305")
+        sed -i \
+            -e 's block/platform/dw_mmc/by-name/USERDATA mmcblk0p12 ' \
+            -e 's block/platform/dw_mmc/by-name/SYSTEM mmcblk0p09 ' \
+            -e 's block/platform/dw_mmc/by-name/CACHE mmcblk0p08 ' \
+            -e 's block/platform/dw_mmc/by-name/BOOT mmcblk0p05 ' \
+            -e 's block/platform/dw_mmc/by-name/RECOVERY mmcblk0p06 ' \
+            -e 's block/platform/dw_mmc/by-name/RADIO mmcblk0p07 ' \
             "$@"
         ;;
     *)
