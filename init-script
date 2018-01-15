@@ -135,20 +135,44 @@ bootsplash() {
     fi
 }
 
+create_by_name_mountpoints()
+{
+    mkdir -p /dev/block/bootdevice/by-name/
+    for dev in $@;
+    do
+        DEVICE=$(echo $dev | sed "s|/dev/||")
+        UEVENT=$(cat /sys/class/block/${DEVICE}/uevent)
+        PARTNAME=$(echo "$UEVENT" | grep "PARTNAME=" | sed "s/PARTNAME=//")
+        MAJOR=$(echo "$UEVENT" | grep "MAJOR=" | sed "s/MAJOR=//")
+        MINOR=$(echo "$UEVENT" | grep "MINOR=" | sed "s/MINOR=//")
+
+        # create a block device
+        mknod /dev/block/bootdevice/by-name/$PARTNAME b $MAJOR $MINOR
+    done
+}
 
 mount_stowaways() {
+    echo "########################## creating block/bootdevice/by-name mountpoints"
+    if [ -e /dev/mmcblk? ]
+    then
+        create_by_name_mountpoints /dev/mmcblk?p*
+    elif [ -e /dev/sd? ]
+    then
+        create_by_name_mountpoints /dev/sd??*
+    fi
+
     echo "########################## mounting stowaways"
     if [ ! -z $DATA_PARTITION ]; then
         data_subdir="$(get_opt data_subdir)"
 
-	mkdir /data
-	mkdir /target
+        mkdir /data
+        mkdir /target
 
-	mount $DATA_PARTITION /data
-	mount /data/rootfs.img /target
+        mount $DATA_PARTITION /data
+        mount /data/rootfs.img /target
 
-	mkdir -p /target/data # in new fs
-	mount --bind /data/${data_subdir} /target/data
+        mkdir -p /target/data # in new fs
+        mount --bind /data/${data_subdir} /target/data
     else
         echo "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
     fi
@@ -157,9 +181,9 @@ mount_stowaways() {
 
 umount_stowaways() {
     if [ ! -z $DATA_PARTITION ]; then
-	umount /target/data
-	umount /target
-	umount /data
+        umount /target/data
+        umount /target
+        umount /data
     fi
 }
 
@@ -320,21 +344,21 @@ if [ "$DONE_SWITCH" = "no" ]; then
     [ -f /target/init_disable_telnet ] && DISABLE_TELNET="y"
 
     if ! [ "$DBG_REASON" = "" ] ; then
-	# During debug we export mmc too (some variations in location here)
-	lun=/sys/class/android_usb/f_mass_storage/lun/file
-	if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
-	lun=/sys/class/android_usb/f_mass_storage/lun0/file
-	if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
-	USB_FUNCTIONS=rndis,mass_storage
+        # During debug we export mmc too (some variations in location here)
+        lun=/sys/class/android_usb/f_mass_storage/lun/file
+        if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
+        lun=/sys/class/android_usb/f_mass_storage/lun0/file
+        if [ -f $lun ]; then echo /dev/mmcblk0 > $lun; fi
+        USB_FUNCTIONS=rndis,mass_storage
 
-	run_debug_session "$DBG_REASON" "y"
+        run_debug_session "$DBG_REASON" "y"
 
-	# Tidy up before we switch_root (rootfs init-debug leaves these running during bootup)
-	killall telnetd
-	killall udhcpd
+        # Tidy up before we switch_root (rootfs init-debug leaves these running during bootup)
+        killall telnetd
+        killall udhcpd
 
-	USB_FUNCTIONS=rndis
-	usb_setup "Mer Debug: done debug, disabling storage"
+        USB_FUNCTIONS=rndis
+        usb_setup "Mer Debug: done debug, disabling storage"
     fi
 
     # Remount the target as ro if it provides the .halium-ro file
