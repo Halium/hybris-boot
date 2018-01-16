@@ -35,10 +35,6 @@ HYBRIS_R_ALWAYSDEBUG := 1
 
 ## All manual "config" should be done above this line
 
-# Force deferred assignment
-
-HYBRIS_FIXUP_MOUNTS := $(LOCAL_PATH)/fixup-mountpoints
-
 
 # Find any fstab files for required partition information.
 # in AOSP we could use TARGET_VENDOR
@@ -61,8 +57,8 @@ endif
 
 # Get the unique /dev field(s) from the line(s) containing the fs mount point
 # Note the perl one-liner uses double-$ as per Makefile syntax
-HYBRIS_BOOT_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /boot $(HYBRIS_FSTABS) | sort -u)
-HYBRIS_DATA_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /data $(HYBRIS_FSTABS) | sort -u)
+HYBRIS_BOOT_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /boot $(HYBRIS_FSTABS) | sort -u | sed "s|block/platform/[^/]*/by-name/|block/bootdevice/by-name/|")
+HYBRIS_DATA_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /data $(HYBRIS_FSTABS) | sort -u | sed "s|block/platform/[^/]*/by-name/|block/bootdevice/by-name/|")
 
 $(warning ********************* /boot appears to live on $(HYBRIS_BOOT_PART))
 $(warning ********************* /data appears to live on $(HYBRIS_DATA_PART))
@@ -163,7 +159,6 @@ $(BOOT_RAMDISK_INIT): $(BOOT_RAMDISK_INIT_SRC) $(ALL_PREBUILT)
 	  -e 's %BOOTLOGO% $(HYBRIS_BOOTLOGO) g' \
 	  -e 's %DEFAULT_OS% $(HYBRIS_B_DEFAULT_OS) g' \
 	  -e 's %ALWAYSDEBUG% $(HYBRIS_B_ALWAYSDEBUG) g' $(BOOT_RAMDISK_INIT_SRC) > $@
-	$(HYBRIS_FIXUP_MOUNTS) "$(TARGET_DEVICE)" "$@"
 	@chmod +x $@
 
 ################################################################
@@ -212,7 +207,6 @@ $(RECOVERY_RAMDISK_INIT): $(RECOVERY_RAMDISK_INIT_SRC) $(ALL_PREBUILT)
 	  -e 's %BOOTLOGO% $(HYBRIS_BOOTLOGO) g' \
 	  -e 's %DEFAULT_OS% $(HYBRIS_R_DEFAULT_OS) g' \
 	  -e 's %ALWAYSDEBUG% $(HYBRIS_R_ALWAYSDEBUG) g' $(RECOVERY_RAMDISK_INIT_SRC) > $@
-	$(HYBRIS_FIXUP_MOUNTS) "$(TARGET_DEVICE)" "$@"
 	@chmod +x $@
 
 
