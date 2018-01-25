@@ -28,6 +28,44 @@ BOOTLOGO=%BOOTLOGO%
 ALWAYSDEBUG=%ALWAYSDEBUG%
 DATA_PARTITION=%DATA_PART%
 DEFAULT_OS=%DEFAULT_OS%
+DEBUG_REASON=
+
+
+log(){
+
+    # log to std out
+    echo "$*"
+
+    # log to usb serial number
+    # this only works after usb_setup()
+    [ -w $ANDROID_USB/iSerial ] && echo -n "$*" > $ANDROID_USB/iSerial ; sleep 1
+
+    # log to kernel log
+    # this only works after do_mount_devprocsys()
+    [ -w /dev/kmsg ] && echo "init-script: $*" >> /dev/kmsg
+}
+
+blink() {
+    for i in $(seq 1 1 $1 ) ; do
+        echo 200 > /sys/class/leds/white/brightness
+        sleep 0.2
+        echo 0 > /sys/class/leds/white/brightness
+        sleep 0.2
+    done
+    sleep 1
+}
+
+
+breathe() {
+    for i in $(seq 0 20 100) ; do
+        echo $i > /sys/class/leds/white/brightness ;
+        sleep 0.1 ;
+    done
+    for i in $(seq 100 -20 0) ; do
+        echo $i > /sys/class/leds/white/brightness ;
+        sleep 0.1 ;
+    done
+}
 
 set_welcome_msg(){
 cat <<EOF > /etc/issue.net
@@ -108,7 +146,7 @@ get_opt() {
 # Minimal mounts for initrd or pre-init debug session
 do_mount_devprocsys()
 {
-    echo "########################## mounting devprocsys"
+    echo "mounting devprocsys"
     mkdir /dev
     mount -t devtmpfs devtmpfs /dev
     # telnetd needs /dev/pts/ entries
@@ -137,20 +175,34 @@ bootsplash() {
 
 
 mount_stowaways() {
-    echo "########################## mounting stowaways"
+    log "mounting stowaways DATA_PARTITION=\"$DATA_PARTITION\", data_subdir=\"$data_subdir\""
     if [ ! -z $DATA_PARTITION ]; then
         data_subdir="$(get_opt data_subdir)"
 
-	mkdir /data
-	mkdir /target
+        mkdir /data
+        mount $DATA_PARTITION /data
+        retval=$?
+        if [ $retval -ne 0 ] ; then
+            log "Failed to mount /data [$retval]" >> /diagnosis.log
+            blink 5
+            DEBUG_REASON="/data not mounted"
+            return
+        fi
 
-	mount $DATA_PARTITION /data
-	mount /data/rootfs.img /target
+        mkdir /target
+        mount /data/rootfs.img /target
+        retval=$?
+        if [ $retval -ne 0 ] ; then
+            log "Failed to mount /target [$retval]" >> /diagnosis.log
+            blink 6
+            DEBUG_REASON="/target not mounted"
+            return
+        fi
 
-	mkdir -p /target/data # in new fs
-	mount --bind /data/${data_subdir} /target/data
+        mkdir -p /target/data # in new fs
+        mount --bind /data/${data_subdir} /target/data
     else
-        echo "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
+        log "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
     fi
     mount
 }
@@ -176,7 +228,7 @@ inject_loop() {
     mkfifo $INJ_STDIN
     echo "This entire directory is for debugging init - it can safely be removed" > $INJ_DIR/README
 
-    echo "########################## Beginning inject loop"
+    log "Beginning inject loop"
     while : ; do
         while read IN; do
 	    if [ "$IN" = "continue" ]; then break 2;fi
@@ -184,7 +236,7 @@ inject_loop() {
         done <$INJ_STDIN
     done
     rm -rf $INJ_DIR # Clean up if we exited nicely
-    echo "########################## inject loop done"
+    log "inject loop done"
 }
 
 # This sets up the USB with whatever USB_FUNCTIONS are set to
@@ -202,19 +254,13 @@ usb_setup() {
       write $ANDROID_USB/functions     $USB_FUNCTIONS
       write $ANDROID_USB/enable        1
 }
-# This lets us communicate errors to host (if it needs disable/enable then that's a problem)
-usb_info() {
-    # make sure USB is settled
-    echo "########################## usb_info: $1"
-    sleep 1
-    write $ANDROID_USB/iSerial       "$1"
-}
 
 
 run_debug_session() {
+    breathe
     CUSTOMPRODUCT=$1
-    echo "########################## Debug session : $1"
-    usb_setup "Mer Debug setting up (DONE_SWITCH=$DONE_SWITCH)"
+    log "Debug session : $1"
+    log "DONE_SWITCH=$DONE_SWITCH"
 
     USB_IFACE=notfound
     /sbin/ifconfig rndis0 $LOCAL_IP && USB_IFACE=rndis0
@@ -226,7 +272,7 @@ run_debug_session() {
 
     # Unable to set up USB interface? Reboot.
     if [ x$USB_IFACE = xnotfound ]; then
-	    usb_info "Mer Debug: ERROR: could not setup USB as usb0 or rndis0"
+	    log "Mer Debug: ERROR: could not setup USB as usb0 or rndis0"
 	    dmesg
 	    sleep 60 # plenty long enough to check usb on host
 	    reboot -f
@@ -240,7 +286,7 @@ run_debug_session() {
     echo "option subnet 255.255.255.0" >> /etc/udhcpd.conf
 
     # Be explicit about busybox so this works in a rootfs too
-    echo "########################## starting dhcpd"
+    log "starting dhcpd"
     $EXPLICIT_BUSYBOX udhcpd
 
     HALT_BOOT="${2:-y}"
@@ -248,14 +294,14 @@ run_debug_session() {
 
     if [ -z $DISABLE_TELNET ]; then
     # Non-blocking telnetd
-    echo "########################## starting telnetd"
+    log "starting telnetd"
     # We run telnetd on different ports pre/post-switch_root This
     # avoids problems with an unterminated pre-switch_root telnetd
     # hogging the port
     $EXPLICIT_BUSYBOX telnetd -b ${LOCAL_IP}:${TELNET_DEBUG_PORT} -l /bin/sh
 
     # For some reason this does not work in rootfs
-    usb_info "Mer Debug telnet on port $TELNET_DEBUG_PORT on $USB_IFACE $LOCAL_IP - also running udhcpd"
+    log "Mer Debug telnet on port $TELNET_DEBUG_PORT on $USB_IFACE $LOCAL_IP - also running udhcpd"
     fi
 
     if [ "$HALT_BOOT" = "y" ]; then
@@ -273,9 +319,9 @@ run_debug_session() {
 
 # writes to /diagnosis.log if there's a problem
 check_kernel_config() {
-    echo "Checking kernel config"
+    log "Checking kernel config"
     if [ ! -e /proc/config.gz ]; then
-	echo "No /proc/config.gz. Enable CONFIG_IKCONFIG and CONFIG_IKCONFIG_PROC" >> /diagnosis.log
+        log "No /proc/config.gz. Enable CONFIG_IKCONFIG and CONFIG_IKCONFIG_PROC" | tee -a /diagnosis.log
     else
 	# Must be =y
 	for x in CONFIG_CGROUPS CONFIG_AUTOFS4_FS CONFIG_DEVTMPFS_MOUNT CONFIG_DEVTMPFS CONFIG_UNIX CONFIG_INOTIFY_USER CONFIG_SYSVIPC CONFIG_NET CONFIG_PROC_FS CONFIG_SIGNALFD CONFIG_SYSFS CONFIG_TMPFS_POSIX_ACL CONFIG_VT; do
@@ -297,6 +343,7 @@ if [ "$DONE_SWITCH" = "no" ]; then
     date
 
     do_mount_devprocsys
+    breathe
 
     do_hotplug_scan
 
@@ -308,6 +355,8 @@ if [ "$DONE_SWITCH" = "no" ]; then
 
     bootsplash
 
+    usb_setup "hybris-boot init-script (initrd)"
+
     mount_stowaways
 
     # No target debug unless we debug here too (for now)
@@ -318,6 +367,11 @@ if [ "$DONE_SWITCH" = "no" ]; then
     [ x$ALWAYSDEBUG = x1 ] && DBG_REASON="Always debug: rndis + mass_storage"
     [ -f /target/init_enter_debug ] && DBG_REASON="/init_enter_debug exists"
     [ -f /target/init_disable_telnet ] && DISABLE_TELNET="y"
+
+    COUNT_VOLUP=$( dmesg | grep "Pressed KEY_VOLUMEUP" | wc -l )
+    [ "$COUNT_VOLUP" -ge 3 ] && DBG_REASON="Repeated VOLUMEUP"
+
+    log "DBG_REASON=$DBG_REASON"
 
     if ! [ "$DBG_REASON" = "" ] ; then
 	# During debug we export mmc too (some variations in location here)
@@ -334,7 +388,7 @@ if [ "$DONE_SWITCH" = "no" ]; then
 	killall udhcpd
 
 	USB_FUNCTIONS=rndis
-	usb_setup "Mer Debug: done debug, disabling storage"
+	log "Mer Debug: done debug, disabling storage"
     fi
 
     # Remount the target as ro if it provides the .halium-ro file
@@ -346,14 +400,16 @@ if [ "$DONE_SWITCH" = "no" ]; then
     echo "" > /proc/sys/kernel/hotplug
 
     if [ -f "/target/init-debug" ]; then
-        echo "hybris-boot: Running init-debug" > /target/data/init-debug-stderrout
+        log "exec switch_root /target /init-debug" | tee -a /target/data/init-debug-stderrout
         exec switch_root /target /init-debug >> /target/data/init-debug-stderrout 2>&1
     else
         # Prefer /sbin/preinit over /sbin/init
         [ -x /target/sbin/preinit ] && INIT=/sbin/preinit || INIT=/sbin/init
-        echo "hybris-boot: Booting $INIT in real rootfs" > /target/data/init-stderrout
+        log "exec switch_root /target $INIT" | tee -a /target/data/init-stderrout
         exec switch_root /target $INIT >> /target/data/init-stderrout 2>&1
     fi
+    log "after exec switch_root"
+    blink 7
     run_debug_session "Failed to boot init in real rootfs"
 
 else
@@ -362,6 +418,7 @@ else
     TELNET_DEBUG_PORT=2323
 
     do_mount_devprocsys
+    usb_setup "hybris-boot init-script (rootfs)"
 
     HALT_BOOT="n"
     [ -f /init_enter_debug2 ] && HALT_BOOT="y"
@@ -374,6 +431,9 @@ else
     # Now try to boot the real init
     # Prefer /sbin/preinit over /sbin/init
     [ -x /sbin/preinit ] && INIT=/sbin/preinit || INIT=/sbin/init
+    log "exec $INIT"
     exec $INIT &> /boot/systemd_stdouterr
     run_debug_session "init in real rootfs failed"
 fi
+log "end"
+
