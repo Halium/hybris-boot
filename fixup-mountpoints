@@ -1129,6 +1129,7 @@ case "$DEVICE" in
              -e 's block/bootdevice/by-name/recovery mmcblk0p22 ' \
             "$@"
         ;;
+
     "jfltexx")
         sed -i \
             -e 's block/platform/msm_sdcc.1/by-name/boot mmcblk0p20 ' \
