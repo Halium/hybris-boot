@@ -1216,7 +1216,6 @@ case "$DEVICE" in
          sed -i \
             -e 's /dev/block/bootdevice/by-name/system /dev/block/mmcblk0p53 ' \
             -e 's /dev/block/bootdevice/by-name/userdata /dev/block/mmcblk0p54 ' \
-            -e 's /dev/block/bootdevice/by-name/metadata /dev/block/mmcblk0p35 ' \
             -e 's /dev/block/bootdevice/by-name/cache /dev/block/mmcblk0p52 ' \
             -e 's /dev/block/bootdevice/by-name/modem /dev/block/mmcblk0p19 ' \
             -e 's /dev/block/bootdevice/by-name/fsg /dev/block/mmcblk0p29 ' \
