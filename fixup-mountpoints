@@ -1488,7 +1488,7 @@ case "$DEVICE" in
 	    "$@"
 	;;
 
-    "land")
+    "land" | "rolex" | "riva")
         sed -i \
 	    -e 's block/bootdevice/by-name/system mmcblk0p24 ' \
 	    -e 's block/bootdevice/by-name/userdata mmcblk0p49 ' \
@@ -1499,17 +1499,6 @@ case "$DEVICE" in
 	    "$@"
 	;;
 	
-    "rolex" | "riva")
-        sed -i \
-	    -e 's block/bootdevice/by-name/system mmcblk0p24 ' \
-	    -e 's block/bootdevice/by-name/userdata mmcblk0p49 ' \
-	    -e 's block/bootdevice/by-name/cache mmcblk0p25 ' \
-	    -e 's block/bootdevice/by-name/persist mmcblk0p26 ' \
-	    -e 's block/bootdevice/by-name/dsp mmcblk0p12 ' \
-	    -e 's block/bootdevice/by-name/modem mmcblk0p1 ' \
-	    "$@"
-	;;
-
     *)
 	cat <<EOF
 
