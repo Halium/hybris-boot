@@ -1499,7 +1499,7 @@ case "$DEVICE" in
 	    "$@"
 	;;
 	
-    "rolex")
+    "rolex" | "riva")
         sed -i \
         -e 's block/bootdevice/by-name/recovery mmcblk0p22 ' \
 	    -e 's block/bootdevice/by-name/system mmcblk0p24 ' \
