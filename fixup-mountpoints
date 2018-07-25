@@ -1501,7 +1501,6 @@ case "$DEVICE" in
 	
     "rolex" | "riva")
         sed -i \
-        -e 's block/bootdevice/by-name/recovery mmcblk0p22 ' \
 	    -e 's block/bootdevice/by-name/system mmcblk0p24 ' \
 	    -e 's block/bootdevice/by-name/userdata mmcblk0p49 ' \
 	    -e 's block/bootdevice/by-name/cache mmcblk0p25 ' \
