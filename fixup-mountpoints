@@ -183,6 +183,16 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "a5y17lte")
+    sed -i \
+        -e 's platform/13540000.dwmmc0/by-name/SYSTEM mmcblk0p19 ' \
+        -e 's platform/13540000.dwmmc0/by-name/CACHE mmcblk0p20 ' \
+        -e 's platform/13540000.dwmmc0/by-name/USERDATA mmcblk0p25 ' \
+        -e 's platform/13540000.dwmmc0/by-name/EFS mmcblk0p3 ' \
+        -e 's platform/13540000.dwmmc0/by-name/HIDDEN mmcblk0p21 ' \
+        "$@"
+    ;;
+        
     "moto_msm8960_jbbl")
        sed -i \
             -e 's block/platform/msm_sdcc.1/by-name/aboot mmcblk0p5 ' \
