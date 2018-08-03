@@ -194,7 +194,7 @@ case "$DEVICE" in
         ;;
 
     "moto_msm8960_jbbl")
-       sed -i \
+        sed -i \
             -e 's block/platform/msm_sdcc.1/by-name/aboot mmcblk0p5 ' \
             -e 's block/platform/msm_sdcc.1/by-name/abootBackup mmcblk0p12 ' \
             -e 's block/platform/msm_sdcc.1/by-name/boot mmcblk0p31 ' \
