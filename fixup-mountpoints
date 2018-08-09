@@ -1041,7 +1041,7 @@ case "$DEVICE" in
              -e 's block/platform/soc/7464900.sdhci/by-name/venus mmcblk0p36 ' \
             "$@"
         ;;
-	"Z00L")
+	"Z00L"|"Z00LD"|"Z00W"|"Z00WD"|"Z00M"|"Z00MD"|"Z00MDD"|"Z00T"|"Z00TD"|"Z00U"|"Z00UD"|"Z00UDH"|"Z00UDB"|"Z011"|"Z011D"|"Z011DD")
         sed -i \
             -e 's block/platform/soc.0/7824900.sdhci/by-name/asdf mmcblk0p33 ' \
             -e 's block/platform/soc.0/7824900.sdhci/by-name/boot mmcblk0p37 ' \
