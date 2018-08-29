@@ -1398,6 +1398,17 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "klte")
+        sed -i \
+            -e 's block/platform/msm_sdcc.1/by-name/system mmcblk0p23 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/userdata mmcblk0p26 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/cache mmcblk0p24 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/apnhlos mmcblk0p1 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/modem mmcblk0p2 ' \
+            -e 's block/platform/msm_sdcc.1/by-name/efs mmcblk0p12 ' \
+            "$@"
+        ;;
+
     "athene")
         sed -i \
             -e 's block/bootdevice/by-name/system mmcblk0p47 ' \
