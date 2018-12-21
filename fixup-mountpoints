@@ -1080,6 +1080,9 @@ case "$DEVICE" in
             -e 's block/bootdevice/by-name/userdata sda13 ' \
             -e 's block/bootdevice/by-name/system sde21 ' \
             -e 's block/bootdevice/by-name/cache sda3 ' \
+            -e 's block/bootdevice/by-name/persist sda2 ' \
+            -e 's block/bootdevice/by-name/modem sde10 ' \
+            -e 's block/bootdevice/by-name/bluetooth sde24 ' \
             "$@"
         ;;
     "oneplus2")
