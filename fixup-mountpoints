@@ -1562,7 +1562,7 @@ case "$DEVICE" in
             -e 's block/bootdevice/by-name/modem sde12 ' \
             "$@"
         ;;
-	
+
     "nicki")
         sed -i \
             -e 's block/platform/msm_sdcc.1/by-name/cache mmcblk0p26 ' \
@@ -1594,6 +1594,29 @@ case "$DEVICE" in
 	    -e 's block/bootdevice/by-name/modem mmcblk0p1 ' \
 	    "$@"
 	;;
+
+    "hermes")
+        sed -i \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/boot mmcblk0p7 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/cache mmcblk0p16 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/expdb mmcblk0p12 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/flashinfo mmcblk0p18 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/lk mmcblk0p6 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/logo mmcblk0p11 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/nvram mmcblk0p2 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/para mmcblk0p10 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/proinfo mmcblk0p1 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/protect1 mmcblk0p3 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/protect2 mmcblk0p4 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/recovery mmcblk0p8 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/seccfg mmcblk0p5 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/secro mmcblk0p9 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/system mmcblk0p15 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/tee1 mmcblk0p13 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/tee2 mmcblk0p14 ' \
+            -e 's block/platform/mtk-msdc.0/11230000.MSDC0/by-name/userdata mmcblk0p17 ' \
+            "$@"
+        ;;
 
     *)
 	cat <<EOF
