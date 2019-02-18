@@ -14,6 +14,17 @@ shift
 echo "Fixing mount-points for device $DEVICE"
 
 case "$DEVICE" in
+    "bb")
+        sed -i \
+            -e 's block/by-name/boot mmcblk0p1 ' \
+            -e 's block/by-name/factory mmcblk0p12 ' \
+            -e 's block/by-name/misc mmcblk0p13 ' \
+            -e 's block/by-name/cache mmcblk0p15 ' \
+            -e 's block/by-name/system mmcblk0p17 ' \
+            -e 's block/by-name/data mmcblk0p18 ' \
+            "$@"
+        ;;
+
     "suzu" | "kugo" | "blanc")
         sed -i \
             -e 's block/bootdevice/by-name/cache mmcblk0p24 ' \
