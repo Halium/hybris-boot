@@ -609,7 +609,7 @@ case "$DEVICE" in
             "$@"
         ;;
 
-    "z3c" | "sirius" | "z3" | "leo")
+    "z3c" | "sirius" | "z3" | "leo" | "honami" | "amami")
     # Z3 compact is also called "aries" | "d5803" in aosp (called z3c in cm12.1)
     # Z2 is also called "d6503" in aosp (called sirius in cm12.1)
     # untested for "amami" | "tianchi")
