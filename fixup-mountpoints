@@ -899,6 +899,67 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "kuntao")
+       sed -i \
+            -e 's block/bootdevice/by-name/DDR /dev/block/mmcblk0p34 ' \
+            -e 's block/bootdevice/by-name/aboot /dev/block/mmcblk0p37 ' \
+            -e 's block/bootdevice/by-name/abootbak /dev/block/mmcblk0p38 ' \
+            -e 's block/bootdevice/by-name/apdp /dev/block/mmcblk0p27 ' \
+            -e 's block/bootdevice/by-name/boot /dev/block/mmcblk0p39 ' \
+            -e 's block/bootdevice/by-name/cache /dev/block/mmcblk0p53 ' \
+            -e 's block/bootdevice/by-name/cmnlib /dev/block/mmcblk0p44 ' \
+            -e 's block/bootdevice/by-name/cmnlib64 /dev/block/mmcblk0p46 ' \
+            -e 's block/bootdevice/by-name/cmnlib64bak /dev/block/mmcblk0p47 ' \
+            -e 's block/bootdevice/by-name/cmnlibbak /dev/block/mmcblk0p45 ' \
+            -e 's block/bootdevice/by-name/config /dev/block/mmcblk0p21 ' \
+            -e 's block/bootdevice/by-name/devcfg /dev/block/mmcblk0p10 ' \
+            -e 's block/bootdevice/by-name/devcfgbak /dev/block/mmcblk0p11 ' \
+            -e 's block/bootdevice/by-name/devinfo /dev/block/mmcblk0p36 ' \
+            -e 's block/bootdevice/by-name/dip /dev/block/mmcblk0p23 ' \
+            -e 's block/bootdevice/by-name/dpo /dev/block/mmcblk0p29 ' \
+            -e 's block/bootdevice/by-name/dsp /dev/block/mmcblk0p15 ' \
+            -e 's block/bootdevice/by-name/frp /dev/block/mmcblk0p18 ' \
+            -e 's block/bootdevice/by-name/fsc /dev/block/mmcblk0p2 ' \
+            -e 's block/bootdevice/by-name/fsg /dev/block/mmcblk0p33 ' \
+            -e 's block/bootdevice/by-name/hw /dev/block/mmcblk0p52 ' \
+            -e 's block/bootdevice/by-name/keymaster /dev/block/mmcblk0p48 ' \
+            -e 's block/bootdevice/by-name/keymasterbak /dev/block/mmcblk0p49 ' \
+            -e 's block/bootdevice/by-name/keystore /dev/block/mmcblk0p20 ' \
+            -e 's block/bootdevice/by-name/limits /dev/block/mmcblk0p41 ' \
+            -e 's block/bootdevice/by-name/lksecapp /dev/block/mmcblk0p42 ' \
+            -e 's block/bootdevice/by-name/lksecappbak /dev/block/mmcblk0p43 ' \
+            -e 's block/bootdevice/by-name/logo /dev/block/mmcblk0p16 ' \
+            -e 's block/bootdevice/by-name/logs /dev/block/mmcblk0p14 ' \
+            -e 's block/bootdevice/by-name/mcfg /dev/block/mmcblk0p26 ' \
+            -e 's block/bootdevice/by-name/mdtp /dev/block/mmcblk0p24 ' \
+            -e 's block/bootdevice/by-name/misc /dev/block/mmcblk0p19 ' \
+            -e 's block/bootdevice/by-name/modem /dev/block/mmcblk0p1 ' \
+            -e 's block/bootdevice/by-name/modemst1 /dev/block/mmcblk0p31 ' \
+            -e 's block/bootdevice/by-name/modemst2 /dev/block/mmcblk0p32 ' \
+            -e 's block/bootdevice/by-name/mota /dev/block/mmcblk0p22 ' \
+            -e 's block/bootdevice/by-name/msadp /dev/block/mmcblk0p28 ' \
+            -e 's block/bootdevice/by-name/persist /dev/block/mmcblk0p17 ' \
+            -e 's block/bootdevice/by-name/preload /dev/block/mmcblk0p55 ' \
+            -e 's block/bootdevice/by-name/prov /dev/block/mmcblk0p50 ' \
+            -e 's block/bootdevice/by-name/recovery /dev/block/mmcblk0p40 ' \
+            -e 's block/bootdevice/by-name/rpm /dev/block/mmcblk0p6 ' \
+            -e 's block/bootdevice/by-name/rpmbak /dev/block/mmcblk0p7 ' \
+            -e 's block/bootdevice/by-name/sbl1 /dev/block/mmcblk0p4 ' \
+            -e 's block/bootdevice/by-name/sbl1bak /dev/block/mmcblk0p5 ' \
+            -e 's block/bootdevice/by-name/sec /dev/block/mmcblk0p35 ' \
+            -e 's block/bootdevice/by-name/secinfo /dev/block/mmcblk0p30 ' \
+            -e 's block/bootdevice/by-name/sp /dev/block/mmcblk0p51 ' \
+            -e 's block/bootdevice/by-name/ssd /dev/block/mmcblk0p3 ' \
+            -e 's block/bootdevice/by-name/syscfg /dev/block/mmcblk0p25 ' \
+            -e 's block/bootdevice/by-name/system /dev/block/mmcblk0p54 ' \
+            -e 's block/bootdevice/by-name/tz /dev/block/mmcblk0p8 ' \
+            -e 's block/bootdevice/by-name/tzbak /dev/block/mmcblk0p9 ' \
+            -e 's block/bootdevice/by-name/userdata /dev/block/mmcblk0p56 ' \
+            -e 's block/bootdevice/by-name/utags /dev/block/mmcblk0p12 ' \
+            -e 's block/bootdevice/by-name/utagsBackup /dev/block/mmcblk0p13 ' \
+            "$@"
+        ;;
+
     "ido")
        sed -i \
             -e 's block/bootdevice/by-name/DDR mmcblk0p19 ' \
