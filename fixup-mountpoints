@@ -1788,7 +1788,16 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "gohan")
+        sed -i \
+            -e 's /dev/block/bootdevice/by-name/system /dev/block/mmcblk0p24 ' \
+            -e 's /dev/block/bootdevice/by-name/userdata /dev/block/mmcblk0p46 ' \
+            -e 's /dev/block/bootdevice/by-name/cache /dev/block/mmcblk0p25 ' \
+            "$@"
+        ;;
+
     *)
+
         cat <<EOF
 
 ****************************************************************
