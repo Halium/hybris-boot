@@ -1805,6 +1805,7 @@ case "$DEVICE" in
             -e 's /dev/block/bootdevice/by-name/diag /dev/block/mmcblk0p39 ' \
             -e 's /dev/block/bootdevice/by-name/modem /dev/block/mmcblk0p3 ' \
             "$@"
+        ;;
 
     *)
         cat <<EOF
