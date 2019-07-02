@@ -1796,6 +1796,16 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "ivy")
+        sed -i \
+            -e 's /dev/block/bootdevice/by-name/system /dev/block/mmcblk0p43 ' \
+            -e 's /dev/block/bootdevice/by-name/userdata /dev/block/mmcblk0p42 ' \
+            -e 's /dev/block/bootdevice/by-name/cache /dev/block/mmcblk0p41 ' \
+            -e 's /dev/block/bootdevice/by-name/persist /dev/block/mmcblk0p31 ' \
+            -e 's /dev/block/bootdevice/by-name/diag /dev/block/mmcblk0p39 ' \
+            -e 's /dev/block/bootdevice/by-name/modem /dev/block/mmcblk0p3 ' \
+            "$@"
+
     *)
         cat <<EOF
 
