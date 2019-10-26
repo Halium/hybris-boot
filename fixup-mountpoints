@@ -1818,6 +1818,19 @@ case "$DEVICE" in
             "$@"
         ;; 
 
+    "kuntao")
+        sed -i \
+            -e 's block/bootdevice/by-name/system mmcblk0p54 ' \
+            -e 's block/bootdevice/by-name/userdata mmcblk0p56 ' \
+            -e 's block/bootdevice/by-name/userdata mmcblk0p56 ' \
+            -e 's block/bootdevice/by-name/cache mmcblk0p53 ' \
+            -e 's block/bootdevice/by-name/persist mmcblk0p17 ' \
+            -e 's block/bootdevice/by-name/dsp mmcblk0p15 ' \
+            -e 's block/bootdevice/by-name/modem mmcblk0p1 ' \
+            -e 's block/bootdevice/by-name/fsg mmcblk0p33 ' \
+            "$@"
+        ;;
+
     *)
         cat <<EOF
 
