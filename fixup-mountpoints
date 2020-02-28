@@ -1894,7 +1894,6 @@ case "$DEVICE" in
             -e 's block/platform/soc/1da4000.ufshc/by-name/vendor_b sde28 ' \
             -e 's block/platform/soc/1da4000.ufshc/by-name/xbl_a sdb1 ' \
             -e 's block/platform/soc/1da4000.ufshc/by-name/xbl_b sdc1 ' \
-
             "$@"
         ;;
 
