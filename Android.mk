@@ -75,6 +75,7 @@ endif
 
 # Command used to make the image
 BB_STATIC := $(PRODUCT_OUT)/utilities/busybox
+E2FSCK_STATIC := $(PRODUCT_OUT)/utilities/e2fsck
 
 ifneq ($(strip $(TARGET_NO_KERNEL)),true)
   INSTALLED_KERNEL_TARGET := $(PRODUCT_OUT)/kernel
@@ -147,7 +148,7 @@ ifdef BOOT_RAMDISK_SEANDROIDENFORCE
 	@echo -n "SEANDROIDENFORCE" >> $@
 endif
 
-$(BOOT_RAMDISK): $(BOOT_RAMDISK_FILES) $(BB_STATIC)
+$(BOOT_RAMDISK): $(BOOT_RAMDISK_FILES) $(BB_STATIC) $(E2FSCK_STATIC)
 	@echo "Making initramfs : $@"
 	@rm -rf $(BOOT_INTERMEDIATE)/initramfs
 	@mkdir -p $(BOOT_INTERMEDIATE)/initramfs
@@ -156,6 +157,7 @@ $(BOOT_RAMDISK): $(BOOT_RAMDISK_FILES) $(BB_STATIC)
 # really hard to depend on things which may affect init.
 	@mv $(BOOT_RAMDISK_INIT) $(BOOT_INTERMEDIATE)/initramfs/init
 	@cp $(BB_STATIC) $(BOOT_INTERMEDIATE)/initramfs/bin/
+	@cp $(E2FSCK_STATIC) $(BOOT_INTERMEDIATE)/initramfs/bin/
 ifeq ($(BOARD_CUSTOM_MKBOOTIMG),pack_intel)
 	@(cd $(BOOT_INTERMEDIATE)/initramfs && find . | cpio -H newc -o ) | $(MINIGZIP) > $(BOOT_RAMDISK)
 else
@@ -201,13 +203,14 @@ ifdef BOOT_RAMDISK_SEANDROIDENFORCE
 	@echo -n "SEANDROIDENFORCE" >> $@
 endif
 
-$(RECOVERY_RAMDISK): $(RECOVERY_RAMDISK_FILES) $(BB_STATIC)
+$(RECOVERY_RAMDISK): $(RECOVERY_RAMDISK_FILES) $(BB_STATIC) $(E2FSCK_STATIC)
 	@echo "Making initramfs : $@"
 	@rm -rf $(RECOVERY_INTERMEDIATE)/initramfs
 	@mkdir -p $(RECOVERY_INTERMEDIATE)/initramfs
 	@cp -a $(RECOVERY_RAMDISK_SRC)/*  $(RECOVERY_INTERMEDIATE)/initramfs
 	@mv $(RECOVERY_RAMDISK_INIT) $(RECOVERY_INTERMEDIATE)/initramfs/init
 	@cp $(BB_STATIC) $(RECOVERY_INTERMEDIATE)/initramfs/bin/
+	@cp $(E2FSCK_STATIC) $(RECOVERY_INTERMEDIATE)/initramfs/bin/
 ifeq ($(BOARD_CUSTOM_MKBOOTIMG),pack_intel)
 	@(cd $(RECOVERY_INTERMEDIATE)/initramfs && find . | cpio -H newc -o ) | $(MINIGZIP) > $(RECOVERY_RAMDISK)
 else

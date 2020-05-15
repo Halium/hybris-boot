@@ -137,22 +137,42 @@ bootsplash() {
 
 
 mount_stowaways() {
-    echo "########################## mounting stowaways"
-    if [ ! -z $DATA_PARTITION ]; then
-        data_subdir="$(get_opt data_subdir)"
+	echo "########################## mounting stowaways"
+	if [ ! -z $DATA_PARTITION ]; then
+		data_subdir="$(get_opt data_subdir)"
 
 	mkdir /data
 	mkdir /target
 
-	mount $DATA_PARTITION /data
+	echo "Checking filesystem integrity for the userdata partition"
+	fsck_start=`date +%s`
+	
+	# Mounting and unmounting /data means the kernel will handle the 
+	# journal/orphans, this is faster than e2fsck doing everything
+	mkdir /tmpmnt
+	mount $DATA_PARTITION /tmpmnt -o errors=remount-ro
+	umount /tmpmnt
+	rmdir /tmpmnt
+	e2fsck -y $DATA_PARTITION
+
+	fsck_end=`date +%s`
+	echo "Finished checking, took $((fsck_end-fsck_start)) second(s)"
+	mount -o discard,data=journal $DATA_PARTITION /data
+
+	echo "Checking rootfs filesystem integrity"
+	fsck_start=`date +%s`
+	e2fsck -y /data/rootfs.img
+	fsck_end=`date +%s`
+	echo "Finished checking, took $((fsck_end-fsck_start)) second(s)"
+
 	mount /data/rootfs.img /target
 
 	mkdir -p /target/data # in new fs
 	mount --bind /data/${data_subdir} /target/data
-    else
-        echo "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
-    fi
-    mount
+	else
+		echo "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
+	fi
+	mount
 }
 
 umount_stowaways() {
