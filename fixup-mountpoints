@@ -1841,6 +1841,19 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "g2m")
+        sed -i \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/system /dev/block/mmcblk0p32 ' \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/userdata /dev/block/mmcblk0p34 ' \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/persist /dev/block/mmcblk0p14 ' \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/modem /dev/block/mmcblk0p1 ' \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/cache /dev/block/mmcblk0p33 ' \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/drm /dev/block/mmcblk0p24 ' \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/mpt /dev/block/mmcblk0p29 ' \
+            -e 's /dev/block/platform/msm_sdcc.1/by-name/sns /dev/block/mmcblk0p25 ' \
+            "$@"
+        ;;
+
     *)
         cat <<EOF
 
