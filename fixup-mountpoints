@@ -1841,6 +1841,18 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "raphael")
+        sed -i \
+            -e 's block/bootdevice/by-name/system sda54 ' \
+            -e 's block/bootdevice/by-name/cache sda29 ' \
+            -e 's block/bootdevice/by-name/userdata sda31 ' \
+            -e 's block/bootdevice/by-name/modem sda52 ' \
+            -e 's block/bootdevice/by-name/dsp sda48 ' \
+            -e 's block/bootdevice/by-name/persist sda23 ' \
+            -e 's block/bootdevice/by-name/bluetooth sda26 ' \
+            "$@"
+        ;;
+
     *)
         cat <<EOF
 
