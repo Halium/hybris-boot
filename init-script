@@ -27,6 +27,7 @@ echo "Running Mer Boat Loader"
 BOOTLOGO=%BOOTLOGO%
 ALWAYSDEBUG=%ALWAYSDEBUG%
 DATA_PARTITION=%DATA_PART%
+SYSTEM_PARTITION=$(findfs LABEL="system")
 DEFAULT_OS=%DEFAULT_OS%
 
 set_welcome_msg(){
@@ -141,14 +142,27 @@ mount_stowaways() {
     if [ ! -z $DATA_PARTITION ]; then
         data_subdir="$(get_opt data_subdir)"
 
-	mkdir /data
-	mkdir /target
+        mkdir /data
+        mkdir /target
 
-	mount $DATA_PARTITION /data
-	mount /data/rootfs.img /target
+        mount $DATA_PARTITION /data
 
-	mkdir -p /target/data # in new fs
-	mount --bind /data/${data_subdir} /target/data
+        if [ -f /data/rootfs.img ]; then
+            mount /data/rootfs.img /target
+        else
+            if [ ! -z $SYSTEM_PARTITION ]; then
+                # Mount the system partition as root filesystem
+                mount $SYSTEM_PARTITION /target
+
+                # Refuse to boot android if installed on system partition
+                if [ -f /target/build.prop ]; then
+                    echo "Refusing to boot android, install a Halium compatible rootfs first!" >> /diagnosis.log
+                fi
+            fi
+        fi
+
+        mkdir -p /target/data # in new fs
+        mount --bind /data/${data_subdir} /target/data
     else
         echo "Failed to mount /target, device node '$DATA_PARTITION' not found!" >> /diagnosis.log
     fi
