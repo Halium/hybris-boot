@@ -1399,50 +1399,12 @@ case "$DEVICE" in
 
     "surnia")
         sed -i \
-            -e 's block/platform/soc.0/by-name/DDR mmcblk0p3 ' \
-            -e 's block/platform/soc.0/by-name/aboot mmcblk0p4 ' \
-            -e 's block/platform/soc.0/by-name/abootBackup mmcblk0p14 ' \
-            -e 's block/platform/soc.0/by-name/boot mmcblk0p33 ' \
-            -e 's block/platform/soc.0/by-name/cache mmcblk0p43 ' \
-            -e 's block/platform/soc.0/by-name/carrier mmcblk0p41 ' \
-            -e 's block/platform/soc.0/by-name/cid mmcblk0p28 ' \
-            -e 's block/platform/soc.0/by-name/clogo mmcblk0p30 ' \
-            -e 's block/platform/soc.0/by-name/dhob mmcblk0p24 ' \
-            -e 's block/platform/soc.0/by-name/factorytune1 mmcblk0p11 ' \
-            -e 's block/platform/soc.0/by-name/factorytune2 mmcblk0p35 ' \
-            -e 's block/platform/soc.0/by-name/frp mmcblk0p20 ' \
-            -e 's block/platform/soc.0/by-name/fsc mmcblk0p26 ' \
-            -e 's block/platform/soc.0/by-name/fsg mmcblk0p25 ' \
-            -e 's block/platform/soc.0/by-name/hob mmcblk0p23 ' \
-            -e 's block/platform/soc.0/by-name/hyp mmcblk0p7 ' \
-            -e 's block/platform/soc.0/by-name/hypBackup mmcblk0p18 ' \
-            -e 's block/platform/soc.0/by-name/keystore mmcblk0p39 ' \
-            -e 's block/platform/soc.0/by-name/kpan mmcblk0p36 ' \
-            -e 's block/platform/soc.0/by-name/logo mmcblk0p29 ' \
-            -e 's block/platform/soc.0/by-name/logs mmcblk0p9 ' \
-            -e 's block/platform/soc.0/by-name/metadata mmcblk0p13 ' \
-            -e 's block/platform/soc.0/by-name/misc mmcblk0p32 ' \
-            -e 's block/platform/soc.0/by-name/modem mmcblk0p1 ' \
-            -e 's block/platform/soc.0/by-name/modemst1 mmcblk0p21 ' \
-            -e 's block/platform/soc.0/by-name/modemst2 mmcblk0p22 ' \
-            -e 's block/platform/soc.0/by-name/oem mmcblk0p40 ' \
-            -e 's block/platform/soc.0/by-name/padA mmcblk0p12 ' \
-            -e 's block/platform/soc.0/by-name/padB mmcblk0p19 ' \
-            -e 's block/platform/soc.0/by-name/padC mmcblk0p37 ' \
-            -e 's block/platform/soc.0/by-name/persist mmcblk0p31 ' \
-            -e 's block/platform/soc.0/by-name/recovery mmcblk0p34 ' \
-            -e 's block/platform/soc.0/by-name/rpm mmcblk0p5 ' \
-            -e 's block/platform/soc.0/by-name/rpmBackup mmcblk0p15 ' \
-            -e 's block/platform/soc.0/by-name/sbl1 mmcblk0p2 ' \
-            -e 's block/platform/soc.0/by-name/sec mmcblk0p10 ' \
-            -e 's block/platform/soc.0/by-name/sp mmcblk0p38 ' \
-            -e 's block/platform/soc.0/by-name/ssd mmcblk0p27 ' \
-            -e 's block/platform/soc.0/by-name/system mmcblk0p42 ' \
-            -e 's block/platform/soc.0/by-name/tz mmcblk0p6 ' \
-            -e 's block/platform/soc.0/by-name/tzBackup mmcblk0p16 ' \
-            -e 's block/platform/soc.0/by-name/userdata mmcblk0p44 ' \
-            -e 's block/platform/soc.0/by-name/utags mmcblk0p8 ' \
-            -e 's block/platform/soc.0/by-name/utagsBackup mmcblk0p17 ' \
+            -e 's /dev/block/bootdevice/by-name/system /dev/block/mmcblk0p42 ' \
+            -e 's /dev/block/bootdevice/by-name/userdata /dev/block/mmcblk0p44 ' \
+            -e 's /dev/block/bootdevice/by-name/cache /dev/block/mmcblk0p43 ' \
+            -e 's /dev/block/bootdevice/by-name/fsg /dev/block/mmcblk0p25 ' \
+            -e 's /dev/block/bootdevice/by-name/modem /dev/block/mmcblk0p1 ' \
+            -e 's /dev/block/bootdevice/by-name/persist /dev/block/mmcblk0p31 ' \
             "$@"
         ;;
 
