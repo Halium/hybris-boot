@@ -145,7 +145,11 @@ mount_stowaways() {
 	mkdir /target
 
 	mount $DATA_PARTITION /data
-	mount /data/rootfs.img /target
+	if [ -f /data/rootfs.img ]; then
+		mount /data/rootfs.img /target
+	else
+		mount -o bind /data/halium-rootfs /target
+	fi
 
 	mkdir -p /target/data # in new fs
 	mount --bind /data/${data_subdir} /target/data
