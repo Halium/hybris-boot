@@ -1841,6 +1841,18 @@ case "$DEVICE" in
             "$@"
         ;;
 
+    "kiwi")
+        sed -i \
+            -e 's block/bootdevice/by-name/log mmcblk0p17 ' \
+            -e 's block/bootdevice/by-name/system mmcblk0p24 ' \
+            -e 's block/bootdevice/by-name/userdata mmcblk0p26 ' \
+            -e 's block/bootdevice/by-name/cust mmcblk0p23 ' \
+            -e 's block/bootdevice/by-name/cache mmcblk0p22 ' \
+            -e 's block/bootdevice/by-name/persist mmcblk0p18 ' \
+            -e 's block/bootdevice/by-name/modem mmcblk0p14 ' \
+            "$@"
+        ;;
+
     *)
         cat <<EOF
 
