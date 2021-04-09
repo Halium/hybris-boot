@@ -1193,7 +1193,7 @@ case "$DEVICE" in
 	    -e 's block/bootdevice/by-name/modem mmcblk0p38 ' \
 	    -e 's block/bootdevice/by-name/modemst1 mmcblk0p16 ' \
 	    -e 's block/bootdevice/by-name/modemst2 mmcblk0p17 ' \
-	    -e 's block/bootdevice/by-name/oem mmcblk0p33	' \
+	    -e 's block/bootdevice/by-name/oem mmcblk0p33 ' \
 	    -e 's block/bootdevice/by-name/persist mmcblk0p36 ' \
 	    -e 's block/bootdevice/by-name/persistent mmcblk0p24 ' \
 	    -e 's block/bootdevice/by-name/recovery mmcblk0p35 ' \
