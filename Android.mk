@@ -63,15 +63,13 @@ endif
 
 # Get the unique /dev field(s) from the line(s) containing the fs mount point
 # Note the perl one-liner uses double-$ as per Makefile syntax
-HYBRIS_BOOT_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /boot $(HYBRIS_FSTABS) | sort -u)
-HYBRIS_DATA_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /data $(HYBRIS_FSTABS) | sort -u)
+define PARTITION_EVALUATION
+$(eval HYBRIS_BOOT_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /boot $(HYBRIS_FSTABS) | sort -u))
+$(eval HYBRIS_DATA_PART := $(shell /usr/bin/perl -w -e '$$fs=shift; if ($$ARGV[0]) { while (<>) { next unless /^$$fs\s|\s$$fs\s/;for (split) {next unless m(^/dev); print "$$_\n"; }}} else { print "ERROR: *fstab* not found\n";}' /data $(HYBRIS_FSTABS) | sort -u))
 
 $(warning ********************* /boot appears to live on $(HYBRIS_BOOT_PART))
 $(warning ********************* /data appears to live on $(HYBRIS_DATA_PART))
-
-ifneq ($(words $(HYBRIS_BOOT_PART))$(words $(HYBRIS_DATA_PART)),11)
-$(error There should be a one and only one device entry for HYBRIS_BOOT_PART and HYBRIS_DATA_PART)
-endif
+endef
 
 # Command used to make the image
 BB_STATIC := $(PRODUCT_OUT)/utilities/busybox
@@ -134,7 +132,12 @@ BOOT_RAMDISK_INIT_SRC := $(LOCAL_PATH)/init-script
 BOOT_RAMDISK_INIT := $(BOOT_INTERMEDIATE)/init
 BOOT_RAMDISK_FILES := $(shell find $(BOOT_RAMDISK_SRC) -type f) $(BOOT_RAMDISK_INIT)
 
-$(LOCAL_BUILT_MODULE): $(INSTALLED_KERNEL_TARGET) $(BOOT_RAMDISK) $(BOOTIMAGE_EXTRA_DEPS)
+$(LOCAL_BUILT_MODULE): $(INSTALLED_KERNEL_TARGET) $(BOOT_RAMDISK) $(BOOTIMAGE_EXTRA_DEPS) $(call PARTITION_EVALUATION)
+
+ifneq ($(words $(HYBRIS_BOOT_PART))$(words $(HYBRIS_DATA_PART)),11)
+	$(error There should be a one and only one device entry for HYBRIS_BOOT_PART and HYBRIS_DATA_PART)
+endif
+
 	@echo "Making hybris-boot.img in $(dir $@) using $(INSTALLED_KERNEL_TARGET) $(BOOT_RAMDISK)"
 	@mkdir -p $(dir $@)
 	@rm -rf $@
